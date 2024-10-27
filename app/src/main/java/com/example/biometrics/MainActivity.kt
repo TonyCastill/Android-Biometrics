@@ -31,9 +31,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.biometrics.BiometricPromptManager.*
 import com.example.biometrics.ui.theme.BiometricsTheme
 
+/**
+ * AppCompatActivity() -> Base class for activities that wish
+ * to use some of the newer platform features on older Android devices.
+ *
+ * ComponentActivity() -> Base class for activities that enables composition of higher level components.
+ * Rather than all functionality being built directly into this class, only the minimal set of lower
+ * level building blocks are included. Higher level components can then be used as needed without
+ * enforcing a deep Activity class hierarchy or strong coupling between components.
+ */
 class MainActivity : AppCompatActivity() {
 
+
+
     private  val promptManager  by lazy{
+        /**
+         * by lazy means we initialize the value as soon
+         * as we access it the fist time
+         */
         BiometricPromptManager(this)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,14 +57,22 @@ class MainActivity : AppCompatActivity() {
         setContent {
             BiometricsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
+                    //Access the flow to collect events
                     val biometricResult by promptManager.promptResults.collectAsState(initial = null)
+
+                    // In order to fire and launch the activity
+                    // to set a biometric or enroll it
                     val enrollLauncher = rememberLauncherForActivityResult(
+                        // We fire the StartActivityFor result to pop up an
+                        // activity where the user can choose a pattern
                         contract = ActivityResultContracts.StartActivityForResult(),
                         onResult = {
                             println("Activity result: $it")
                         }
                     )
+
+                    // To prompt the user to set a biometric
+                    // signature in case it hasn't been set
                     LaunchedEffect(biometricResult) {
                         if(biometricResult is BiometricResult.AuthenticationNotSet){
                             if(Build.VERSION.SDK_INT >= 30){
@@ -57,8 +80,10 @@ class MainActivity : AppCompatActivity() {
                                     putExtra(
                                         Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
                                         BIOMETRIC_STRONG or DEVICE_CREDENTIAL
+                                        // Alt + Enter -> import that
                                     )
                                 }
+                                // Fire the activity
                                 enrollLauncher.launch(enrollIntent)
                             }
                         }
@@ -70,6 +95,7 @@ class MainActivity : AppCompatActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
+                        //Simple button
                         Button(onClick = {
                             promptManager.showBiometricPrompt(
                                 title = "Sample prompt",
@@ -78,11 +104,14 @@ class MainActivity : AppCompatActivity() {
                         }) {
                             Text(text = "Authenticate")
                         }
-                        biometricResult?.let{
-                            result ->
+                        biometricResult?.let{ //like an if after the event
+                            result -> // Do something according to the result
                             Text(
                                 text = when(result){
-                                    //Alt + Enter
+                                    //Alt + Enter -> Add remaining branches
+
+                                    //Select the first sentence before the dot
+                                    // Alt+ Enter -> import memembers from ....
                                     is BiometricResult.AuthenticationError -> {
                                         result.error
                                     }
