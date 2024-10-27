@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--parent="android:Theme.Material.Light.NoActionBar"-->
+    <!--AppCompat requires an AppCompat theme-->
     <style name="Theme.Biometrics" parent="Theme.AppCompat.NoActionBar" />
 </resources>
